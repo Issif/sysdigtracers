@@ -27,20 +27,27 @@ func getFunctionName() string {
 // first string in elements will be used as tags, other strings will be arguments.
 // if elements is empty (no tag), name of caller function is set.
 func Entry(id, tags string, args ...string) Tracer {
-	if tags == "" {
-		tags = getFunctionName()
+	switch id {
+	case "", "t", "p", "pp":
+		//
+	default:
+		if id != "" && id != "t" && id != "p" && id != "pp" {
+			if _, err := strconv.Atoi(id); err != nil {
+				id = ""
+			}
+		}
 	}
 
-	if id != "" || id != "t" || id != "p" || id != "pp" {
-		if _, err := strconv.Atoi(id); err != nil {
-			return
-		}
+	if tags == "" {
+		tags = getFunctionName()
 	}
 
 	t := Tracer{Id: id, Tags: tags}
 
 	if len(args) != 0 {
 		t.Args = args[0]
+	} else {
+		t.Args = ""
 	}
 
 	d := []byte(">:" + t.Id + ":" + t.Tags + ":" + t.Args + ":")

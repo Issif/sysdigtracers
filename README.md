@@ -17,7 +17,8 @@ import github.com/Issif/sysdigtracers
 ```
 * Idiomatic way is to add at beginning of each function you want to trace :
 ```
-defer sysdigtracers.Entry("id", "tags", "args").Exit("args")
+t:= sysdigtracers.Entry("id", "tags", "args")
+defer t.Exit("args")
 ```
 * With (see https://github.com/draios/sysdig/wiki/Tracers#fields-explanation) :
     * **id** (required) : a string, can be empty
@@ -27,11 +28,11 @@ defer sysdigtracers.Entry("id", "tags", "args").Exit("args")
 * You can also add entry and exit events anywhere in your function :
 ```
 func myFunction() {
-... some stuff ...
+//... some stuff ...
 t := sysdigtracers.Entry("", "")
-... some stuff ...
+//... some stuff ...
 t.Exit()
-... some stuff ...
+//... some stuff ...
 }
 ```
 # example
@@ -49,7 +50,8 @@ import (
 )
 
 func mandelbrot(a complex128) (z complex128) {
-	defer sysdigtracers.Entry("", "").Exit()
+	t := sysdigtracers.Entry("", "")
+	defer t.Exit("")
 	for i := 0; i < 50; i++ {
 		z = z*z + a
 	}
