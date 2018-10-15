@@ -4,11 +4,12 @@ package sysdigtracers
 import (
 	"io/ioutil"
 	"runtime"
+	"strconv"
 )
 
 // Tracer represents a tracer
 type Tracer struct {
-	Id   string // Id string should be a 64bit integer or t, p, pp (see: https://github.com/draios/sysdig/wiki/Tracers#fields-explanation).
+	Id   string // Id string should be a 64bit integer or t, p, pp or empty (see: https://github.com/draios/sysdig/wiki/Tracers#fields-explanation).
 	Tags string // Tags string should be a list of one or more strings separated by periods. if empty, name of caller function is set.
 	Args string // Args string is a list of key-value pairs to be associated with the tracer (optionnal).
 }
@@ -25,17 +26,22 @@ func getFunctionName() string {
 // id and elements can be empty strings.
 // first string in elements will be used as tags, other strings will be arguments.
 // if elements is empty (no tag), name of caller function is set.
-func Entry(id string, elements ...string) Tracer {
-	if elements[0] == "" {
-		elements[0] = getFunctionName()
+func Entry(id, tags string, args ...string) Tracer {
+	if tags == "" {
+		tags = getFunctionName()
 	}
 
-	var args string
-	if len(elements) > 1 {
-		args = elements[1]
+	if id != "" || id != "t" || id != "p" || id != "pp" {
+		if _, err := strconv.Atoi(id); err != nil {
+			return
+		}
 	}
 
-	t := Tracer{Id: id, Tags: elements[0], Args: args}
+	t := Tracer{Id: id, Tags: tags}
+
+	if len(args) != 0 {
+		t.Args = args[0]
+	}
 
 	d := []byte(">:" + t.Id + ":" + t.Tags + ":" + t.Args + ":")
 	ioutil.WriteFile("/dev/null", d, 0777)
