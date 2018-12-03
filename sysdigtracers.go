@@ -1,4 +1,4 @@
-// Package sysdigtracers let you add easily sysdig tracers in your Go code.
+// Package sysdigtracers let you add easily sysdig tracers (https://github.com/draios/sysdig/wiki/Tracers) in your Go code.
 package sysdigtracers
 
 import (
